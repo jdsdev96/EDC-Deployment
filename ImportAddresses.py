@@ -1,6 +1,9 @@
 from codecs import raw_unicode_escape_decode
 import os
 import csv
+import shutil
+
+
 
 print("Fault Address Layout Import")
 
@@ -13,10 +16,14 @@ except ModuleNotFoundError:
     print("Openpyxl library is not installed.")
     inst_openpyxl()
 
+def manages_files():
+    wrk_dir = os.getcwd()
+    print(wrk_dir)
+
 
 def main():
+    manages_files()
     check_perm()
-
     wb = openpyxl.load_workbook(filename="BW Specific Fault Layout Toyopuc V9.xlsx")
     ws = wb["Import Cheat Sheet"]
 
