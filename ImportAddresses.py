@@ -1,23 +1,12 @@
-import sys
-import subprocess
+from codecs import raw_unicode_escape_decode
 import os
 import csv
-import string
 
+print("Fault Address Layout Import")
 
 def inst_openpyxl():
     None
 
-
-def inst_pandas():
-    None
-
-
-try:
-    import pandas as pd
-except ModuleNotFoundError:
-    print("Pandas library not installed.")
-    inst_pandas()
 try:
     import openpyxl
 except ModuleNotFoundError:
@@ -27,42 +16,44 @@ except ModuleNotFoundError:
 
 def main():
     check_perm()
-    temp_sheet = pd.read_excel("BW Specific Fault Layout Toyopuc V9.xlsx", skiprows=1)
-    #print(temp_sheet)
-    pc_win_data = pd.read_csv("TMMI_UB_Respot_Main_20220827.csv", encoding="ISO8859")
-    #print(pc_win_data)
-    print(temp_sheet.iat[0,1])
-    match_count = 0
-    gmf_count = 0
+
     wb = openpyxl.load_workbook(filename="BW Specific Fault Layout Toyopuc V9.xlsx")
     ws = wb["Import Cheat Sheet"]
 
-    address_list = []
+    address_array = []
     for i in range(ws.max_row):
         addy = ws.cell(i+3,2).value
-        if addy[0:3] == "GMF":
-            address_list.append(addy)
-    print(address_list)
-
-    for x in range(len(temp_sheet)):
-        req_add = temp_sheet.iat[x, 1]
-        if req_add[0:3] == "GMF":
-            gmf_count = gmf_count + 1
-            for y in range(len(pc_win_data)):
-                if req_add == pc_win_data.iat[y,0]:
-                    match_count = match_count + 1
-                    ws.cell(row = x + 3 , column = 6).value = req_add
-                    break
-                else:
-                    continue
-        else:
+        if type(addy) != str:
             continue
-    wb.save("BW Specific Fault Layout Toyopuc V9.xlsx")
+        elif addy[0:3] == "GMF":
+            address_array.append([addy, i + 3])# [0]requested address [1]position
+        elif addy[0:2] == "EM":
+            address_array.append([addy, i + 3])
+        else:
+            pass
+    """
+    print(address_array)
+    print(len(address_array))
+    """
+
+
+    comment_array = list(csv.reader(open("TMMI_UB_Respot_Main_20220827.csv", encoding= "ISO8859")))
+    #print(len(comment_array))
+    match_count = 0
+    for i in range(len(address_array)):
+        for comment in comment_array:
+            if address_array[i][0] == comment[0]:
+                ws.cell(row=address_array[i][1], column=6).value = comment[0]
+                ws.cell(row=address_array[i][1], column=7).value = comment[1]
+                match_count+=1
+            else:
+                continue
     print(match_count)
-    print(gmf_count)
+    wb.save("BW Specific Fault Layout Toyopuc V9.xlsx")
 
 
 def check_perm():
+    print("Going to check a few things before we start...")
     print("BW Specific Fault Layout Toyopuc V9.xlsx... file exsists =", os.access("BW Specific Fault Layout Toyopuc V9.xlsx", os.F_OK))
     print("BW Specific Fault Layout Toyopuc V9.xlsx... read access =", os.access("BW Specific Fault Layout Toyopuc V9.xlsx", os.R_OK))
     print("BW Specific Fault Layout Toyopuc V9.xlsx... write access =", os.access("BW Specific Fault Layout Toyopuc V9.xlsx", os.W_OK))
