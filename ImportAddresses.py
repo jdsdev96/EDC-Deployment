@@ -1,6 +1,8 @@
 import sys
 import subprocess
 import os
+import csv
+import string
 
 
 def inst_openpyxl():
@@ -34,6 +36,13 @@ def main():
     gmf_count = 0
     wb = openpyxl.load_workbook(filename="BW Specific Fault Layout Toyopuc V9.xlsx")
     ws = wb["Import Cheat Sheet"]
+
+    address_list = []
+    for i in range(ws.max_row):
+        addy = ws.cell(i+3,2).value
+        if addy[0:3] == "GMF":
+            address_list.append(addy)
+    print(address_list)
 
     for x in range(len(temp_sheet)):
         req_add = temp_sheet.iat[x, 1]
