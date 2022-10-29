@@ -98,12 +98,13 @@ def main():
                 ws.cell(row=address_array[i][1], column=7).value = comment[1]
                 match_count+=1
             elif i % 525 == 0:#update progress
-                sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str('{:.2f}'.format((i / array_len) * 100)) + "%")
-                sys.stdout.flush()
+                #sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str('{:.2f}'.format((i / array_len) * 100)) + "%")
+                #sys.stdout.flush()
+                continue
             else:
                 pass
-    sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str(100.00) + "%")
-    sys.stdout.flush()
+    #sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str(100.00) + "%")
+    #sys.stdout.flush()
     print("\n\u001b[0m\u001b[37mNumber of comments wrote:\u001b[32m" + str(match_count))
     if match_count == 0:
         print("\u001b[33m***No matches were found. Make sure your input and template files are correct***")
