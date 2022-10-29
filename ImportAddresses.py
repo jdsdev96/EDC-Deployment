@@ -5,6 +5,7 @@ import os
 import csv
 import shutil
 import threading
+os.system('color')
 print("\u001b[4m\u001b[35mLayout Import Script\u001b[0m")
 print("\u001b[37m\u001b[0mPython Version " + sys.version)
 if sys.version[:7] != "3.10.8 ":
@@ -75,7 +76,7 @@ def manages_files():
 #Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
-    input("Press Enter to close window...")
+    #input("Press Enter to close window...")
     exit()
 
 
