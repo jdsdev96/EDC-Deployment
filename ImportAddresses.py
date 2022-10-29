@@ -23,6 +23,7 @@ except ModuleNotFoundError:
     print("\u001b[31;1mOpenpyxl library is not installed.")
     install_openpyxl()
 
+
 import openpyxl
 
 
@@ -86,38 +87,49 @@ def done():
     #input("Press Enter to close window...")
     exit()
 
+#gets address that need comments
+def get_address_array_from_temp(sheet):
+    array = []
+    for i in range(sheet.max_row):
+        addy = sheet.cell(i+3,2).value
+        if type(addy) != str:
+            continue
+        elif addy[0:3] == "GMF":
+            array.append([addy, i + 3])# [0]requested address [1]position
+        elif addy[0:2] == "EM":
+            array.append([addy, i + 3])#adding 3 to index number to offset for formating of template
+        else:
+            pass
+    return array
+
+#gets all address that have comments
+def get_address_comment_array_from_input(location):
+    try:
+        array = list(csv.reader(open(location, encoding= "ISO8859")))
+    except PermissionError:
+        print("\u001b[1m\u001b[31mError: Could not access input file.")
+        done()
+    return array
+
 
 def main():
     preamble()#run preamble
 
     #get file locations and names
     file_locs = manages_files()#file_locs[template, output, input]
-    
+
     #open output workbook and worksheet
     wb = openpyxl.load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
     #gather addresses that need comments
-    address_array = []
-    for i in range(ws.max_row):
-        addy = ws.cell(i+3,2).value
-        if type(addy) != str:
-            continue
-        elif addy[0:3] == "GMF":
-            address_array.append([addy, i + 3])# [0]requested address [1]position
-        elif addy[0:2] == "EM":
-            address_array.append([addy, i + 3])#adding 3 to index number to offset for formating of template
-        else:
-            pass
+    address_array = get_address_array_from_temp(ws)
     #print(address_array)
     #print(len(address_array))
 
-    
+
     #open and read the csv file into an array.
-    try:
-        address_comment_array = list(csv.reader(open(file_locs[2], encoding= "ISO8859")))
-    except PermissionError:
-        print("\u001b[1m\u001b[31mError: Could not access input file.")
+    address_comment_array = get_address_comment_array_from_input(file_locs[2])
     #print(len(comment_array))
     
     match_count = 0
@@ -137,7 +149,7 @@ def main():
                 pass
     #save changes to the ouput file
     wb.save(file_locs[1])
-    
+
     #display stats
     progress_bar(address_array_len, address_array_len)
     print("\nDone.")
