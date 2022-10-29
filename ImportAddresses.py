@@ -4,14 +4,9 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
-os.system('color')
-print("\u001b[4m\u001b[35;1mLayout Import Script\u001b[0m")
-print("\u001b[37m\u001b[0mPython Version " + sys.version)
-if sys.version[:7] != "3.10.8 ":
-    print("\u001b[33;1m***The version of Python is different from what this script was written on. Errors may occur.***")
 
 
-def inst_openpyxl():
+def install_openpyxl():
     print("\u001b[33m\nInstalling openpyxl...")
     # implement pip as a subprocess:
     check_call([sys.executable, '-m', 'pip', 'install', 'openpyxl'])
@@ -26,10 +21,17 @@ try:
     import openpyxl
 except ModuleNotFoundError:
     print("\u001b[31;1mOpenpyxl library is not installed.")
-    inst_openpyxl()
-
+    install_openpyxl()
 
 import openpyxl
+
+
+def preamble():
+    os.system('color')
+    print("\u001b[4m\u001b[35;1mLayout Import Script\u001b[0m")
+    print("\u001b[37m\u001b[0mPython Version " + sys.version)
+    if sys.version[:7] != "3.10.8 ":
+        print("\u001b[33;1m***The version of Python is different from what this script was written on. Errors may occur.***")
 
 
 #Confirming, finding, and copying files.
@@ -72,6 +74,12 @@ def manages_files():
     return locations
 
 
+def progress_bar(progress, total):
+    percent = 100 * (progress / float(total))
+    bar = '█' * int(percent) + '-' * (100 - int(percent))
+    print(f"\r|{bar}| {percent:.2f}%", end="\r")
+
+
 #Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
@@ -79,18 +87,17 @@ def done():
     exit()
 
 
-def progress_bar(progress, total):
-    percent = 100 * (progress / float(total))
-    bar = '█' * int(percent) + '-' * (100 - int(percent))
-    print(f"\r|{bar}| {percent:.2f}%", end="\r")
-
 def main():
-    
+    preamble()#run preamble
+
+    #get file locations and names
     file_locs = manages_files()#file_locs[template, output, input]
     
+    #open output workbook and worksheet
     wb = openpyxl.load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
+    #gather addresses that need comments
     address_array = []
     for i in range(ws.max_row):
         addy = ws.cell(i+3,2).value
@@ -99,42 +106,47 @@ def main():
         elif addy[0:3] == "GMF":
             address_array.append([addy, i + 3])# [0]requested address [1]position
         elif addy[0:2] == "EM":
-            address_array.append([addy, i + 3])
+            address_array.append([addy, i + 3])#adding 3 to index number to offset for formating of template
         else:
             pass
-    """
-    print(address_array)
-    print(len(address_array))
-    """
-    #open and read the csv file.
+    #print(address_array)
+    #print(len(address_array))
+
+    
+    #open and read the csv file into an array.
     try:
-        comment_array = list(csv.reader(open(file_locs[2], encoding= "ISO8859")))
+        address_comment_array = list(csv.reader(open(file_locs[2], encoding= "ISO8859")))
     except PermissionError:
         print("\u001b[1m\u001b[31mError: Could not access input file.")
     #print(len(comment_array))
+    
     match_count = 0
-    array_len = len(address_array)
+    address_array_len = len(address_array)
     print("\n\u001b[0m\u001b[32mWorking on it...")
-    #loop through the addresses and compare to the csv list
-    for i in range(array_len):
-        for comment in comment_array:
-            if address_array[i][0] == comment[0]:
-                ws.cell(row=address_array[i][1], column=6).value = comment[0]
-                ws.cell(row=address_array[i][1], column=7).value = comment[1]
+    #loop through the addresses and compare to the array with comments
+    for i in range(address_array_len):
+        for address in address_comment_array:
+            if address_array[i][0] == address[0]:
+                ws.cell(row=address_array[i][1], column=6).value = address[0]
+                ws.cell(row=address_array[i][1], column=7).value = address[1]
                 match_count+=1
             elif i % 250 == 0:#update progress
-                progress_bar(i, array_len)
+                progress_bar(i, address_array_len)
                 continue
             else:
                 pass
-    progress_bar(array_len, array_len)
+    #save changes to the ouput file
+    wb.save(file_locs[1])
+    
+    #display stats
+    progress_bar(address_array_len, address_array_len)
     print("\nDone.")
     print("\n\u001b[34;1mNumber of comments wrote:\u001b[33m" + str(match_count))
     if match_count == 0:
         print("\u001b[33;1m***No matches were found. Make sure your input and template files are correct***")
-    wb.save(file_locs[1])
 
     done()
+    #end of main
 
 
 main()
