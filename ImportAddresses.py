@@ -89,7 +89,7 @@ def main():
     #print(len(comment_array))
     match_count = 0
     array_len = len(address_array)
-    print("\u001b[0m\u001b[36mProgress...")
+    print("\u001b[0m\u001b[36mWroking on it...")
     #loop through the addresses and compare to the csv list
     for i in range(array_len):
         for comment in comment_array:
