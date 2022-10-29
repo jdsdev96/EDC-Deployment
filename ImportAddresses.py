@@ -4,11 +4,11 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
+print("\u001b[4m\u001b[35mLayout Import Script\u001b[0m\n\n")
 
-print("Layout Import Script")
 
 def inst_openpyxl():
-    print("\n Installing openpyxl...")
+    print("\u001b[33m\n Installing openpyxl...")
     # implement pip as a subprocess:
     check_call([sys.executable, '-m', 'pip', 'install', 'openpyxl'])
 
@@ -21,20 +21,45 @@ def inst_openpyxl():
 try:
     import openpyxl
 except ModuleNotFoundError:
-    print("Openpyxl library is not installed.")
+    print("\u001b[31m Openpyxl library is not installed.")
     inst_openpyxl()
+
 
 import openpyxl
 
+
+#Confirming, finding, and copying files.
 def manages_files():
     wrk_dir = os.getcwd()
-    print(wrk_dir)
+    temp_dir = wrk_dir + '//template'
+    out_dir = wrk_dir + '//output'
+    in_dir = wrk_dir + '//input'
+    #confirming files
+    try:
+        temp_loc = temp_dir + '//' + os.listdir(temp_dir)[0]
+    except FileNotFoundError:
+        print("\u001b[1m\u001b[31mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
+        done()
+    try:
+        in_loc = in_dir + '//' + os.listdir(in_dir)[0]
+    except FileNotFoundError:
+        print("\u001b[1m\u001b[31mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
+        done()
+    #Copying template file to output directory
+    try:
+        shutil.copy(temp_loc, out_dir + '//out_' + os.listdir(temp_dir)[0])
+    except FileNotFoundError:
+        print("\u001b[1m\u001b[31mThe output directory was not found.\n\nPlease add the output directory and restart.")
+        done()
+    out_loc = out_dir + '//' + os.listdir(out_dir)[0]
+    locations = [temp_loc, out_loc, in_loc]
+    return locations
 
 
 def main():
-    manages_files()
-    check_perm()
-    wb = openpyxl.load_workbook(filename="BW Specific Fault Layout Toyopuc V9.xlsx")
+    file_locs = manages_files()#file_locs[template, output, input]
+    
+    wb = openpyxl.load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
     address_array = []
@@ -52,30 +77,35 @@ def main():
     print(address_array)
     print(len(address_array))
     """
-
-
-    comment_array = list(csv.reader(open("TMMI_UB_Respot_Main_20220827.csv", encoding= "ISO8859")))
+    try:
+        comment_array = list(csv.reader(open(file_locs[2], encoding= "ISO8859")))
+    except PermissionError:
+        print("\u001b[1m\u001b[31mError: Could not access input file.")
     #print(len(comment_array))
     match_count = 0
-    for i in range(len(address_array)):
+    array_len = len(address_array)
+    print("\u001b[33mProgress...")
+    for i in range(array_len):
         for comment in comment_array:
             if address_array[i][0] == comment[0]:
                 ws.cell(row=address_array[i][1], column=6).value = comment[0]
                 ws.cell(row=address_array[i][1], column=7).value = comment[1]
                 match_count+=1
+            elif i % 525 == 0:
+                sys.stdout.write(u"\u001b[37m\u001b[1000D" + str('{:.2f}'.format((i / array_len) * 100)) + "%")
+                sys.stdout.flush()
             else:
-                continue
-    print(match_count)
-    wb.save("BW Specific Fault Layout Toyopuc V9.xlsx")
+                pass
+    sys.stdout.write(u"\u001b[37m\u001b[1000D" + str(100.00) + "%")
+    sys.stdout.flush()
+    print("\n\u001b[37mNumber of comments wrote:\u001b[32m" + str(match_count))
+    wb.save(file_locs[1])
+
+    done()
 
 
-def check_perm():
-    print("Going to check a few things before we start...")
-    print("BW Specific Fault Layout Toyopuc V9.xlsx... file exsists =", os.access("BW Specific Fault Layout Toyopuc V9.xlsx", os.F_OK))
-    print("BW Specific Fault Layout Toyopuc V9.xlsx... read access =", os.access("BW Specific Fault Layout Toyopuc V9.xlsx", os.R_OK))
-    print("BW Specific Fault Layout Toyopuc V9.xlsx... write access =", os.access("BW Specific Fault Layout Toyopuc V9.xlsx", os.W_OK))
-    print("TMMI_UB_Respot_Main_20220827.csv... file exsists =", os.access("TMMI_UB_Respot_Main_20220827.csv", os.F_OK))
-    print("TMMI_UB_Respot_Main_20220827.csv... read access =", os.access("TMMI_UB_Respot_Main_20220827.csv", os.F_OK))
-
+def done():
+    print("\u001b[37m\u001b[0m")
+    exit()
 
 main()
