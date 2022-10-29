@@ -4,6 +4,7 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
+import time
 
 
 def install_openpyxl():
