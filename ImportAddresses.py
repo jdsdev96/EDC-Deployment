@@ -4,16 +4,15 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
-import threading
 os.system('color')
-print("\u001b[4m\u001b[35mLayout Import Script\u001b[0m")
+print("\u001b[4m\u001b[35;1mLayout Import Script\u001b[0m")
 print("\u001b[37m\u001b[0mPython Version " + sys.version)
 if sys.version[:7] != "3.10.8 ":
-    print("\u001b[33m***The version of Python is different from what this script was written on. Errors may occur.***")
+    print("\u001b[33;1m***The version of Python is different from what this script was written on. Errors may occur.***")
 
 
 def inst_openpyxl():
-    print("\u001b[33m\n Installing openpyxl...")
+    print("\u001b[33m\nInstalling openpyxl...")
     # implement pip as a subprocess:
     check_call([sys.executable, '-m', 'pip', 'install', 'openpyxl'])
 
@@ -26,7 +25,7 @@ def inst_openpyxl():
 try:
     import openpyxl
 except ModuleNotFoundError:
-    print("\u001b[31m Openpyxl library is not installed.")
+    print("\u001b[31;1mOpenpyxl library is not installed.")
     inst_openpyxl()
 
 
@@ -44,21 +43,21 @@ def manages_files():
         temp_loc = temp_dir + '//' + os.listdir(temp_dir)[0]
     except FileNotFoundError:
         print("\n")
-        print("\u001b[1m\u001b[31mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
+        print("\u001b[1m\u001b[31;1mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
         done()
     except IndexError:
         print("\n")
-        print("\u001b[1m\u001b[31mThe template file was not found.\n\nPlease add the template file to the template directory and restart.")
+        print("\u001b[1m\u001b[31;1mThe template file was not found.\n\nPlease add the template file to the template directory and restart.")
         done()
     try:
         in_loc = in_dir + '//' + os.listdir(in_dir)[0]
     except FileNotFoundError:
         print("\n")
-        print("\u001b[1m\u001b[31mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
+        print("\u001b[1m\u001b[31;1mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
         done()
     except IndexError:
         print("\n")
-        print("\u001b[1m\u001b[31mThe input file was not found.\n\nPlease add the input file to the input directory and restart.")
+        print("\u001b[1m\u001b[31;1mThe input file was not found.\n\nPlease add the input file to the input directory and restart.")
         done()
     #Copying template file to output directory
     try:
@@ -66,7 +65,7 @@ def manages_files():
     except FileNotFoundError:
         
         print("\n")
-        print("\u001b[1m\u001b[31mThe output directory was not found.\n\nPlease add the output directory and restart.")
+        print("\u001b[1m\u001b[31;1mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
     out_loc = out_dir + '//' + os.listdir(out_dir)[0]
     locations = [temp_loc, out_loc, in_loc]
@@ -115,7 +114,7 @@ def main():
     #print(len(comment_array))
     match_count = 0
     array_len = len(address_array)
-    print("\n\u001b[0m\u001b[36mWorking on it...")
+    print("\n\u001b[0m\u001b[32mWorking on it...")
     #loop through the addresses and compare to the csv list
     for i in range(array_len):
         for comment in comment_array:
@@ -130,9 +129,9 @@ def main():
                 pass
     progress_bar(array_len, array_len)
     print("\nDone.")
-    print("\n\u001b[0m\u001b[37mNumber of comments wrote:\u001b[32m" + str(match_count))
+    print("\n\u001b[34;1mNumber of comments wrote:\u001b[33m" + str(match_count))
     if match_count == 0:
-        print("\u001b[33m***No matches were found. Make sure your input and template files are correct***")
+        print("\u001b[33;1m***No matches were found. Make sure your input and template files are correct***")
     wb.save(file_locs[1])
 
     done()
