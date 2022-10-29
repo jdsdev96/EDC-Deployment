@@ -1,20 +1,30 @@
 from codecs import raw_unicode_escape_decode
+import sys
+from subprocess import check_call, check_output
 import os
 import csv
 import shutil
 
-
-
-print("Fault Address Layout Import")
+print("Layout Import Script")
 
 def inst_openpyxl():
-    None
+    print("\n Installing openpyxl...")
+    # implement pip as a subprocess:
+    check_call([sys.executable, '-m', 'pip', 'install', 'openpyxl'])
+
+    # process output with an API in the subprocess module:
+    reqs = check_output([sys.executable, '-m', 'pip','freeze'])
+    installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
+
+    print(installed_packages)
 
 try:
     import openpyxl
 except ModuleNotFoundError:
     print("Openpyxl library is not installed.")
     inst_openpyxl()
+
+import openpyxl
 
 def manages_files():
     wrk_dir = os.getcwd()
