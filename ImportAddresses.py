@@ -45,16 +45,25 @@ def manages_files():
         print("\n")
         print("\u001b[1m\u001b[31mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
         done()
+    except IndexError:
+        print("\n")
+        print("\u001b[1m\u001b[31mThe template file was not found.\n\nPlease add the template file to the template directory and restart.")
+        done()
     try:
         in_loc = in_dir + '//' + os.listdir(in_dir)[0]
     except FileNotFoundError:
         print("\n")
         print("\u001b[1m\u001b[31mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
         done()
+    except IndexError:
+        print("\n")
+        print("\u001b[1m\u001b[31mThe input file was not found.\n\nPlease add the input file to the input directory and restart.")
+        done()
     #Copying template file to output directory
     try:
         shutil.copy(temp_loc, out_dir + '//out_' + os.listdir(temp_dir)[0])
     except FileNotFoundError:
+        
         print("\n")
         print("\u001b[1m\u001b[31mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
@@ -66,6 +75,7 @@ def manages_files():
 #Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
+    input("Press Enter to close window...")
     exit()
 
 
