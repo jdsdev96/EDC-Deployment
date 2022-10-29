@@ -4,6 +4,7 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
+import threading
 print("\u001b[4m\u001b[35mLayout Import Script\u001b[0m")
 print("\u001b[37m\u001b[0mPython Version " + sys.version)
 if sys.version[:7] != "3.10.8 ":
@@ -33,7 +34,6 @@ import openpyxl
 
 #Confirming, finding, and copying files.
 def manages_files():
-    print("\n")
     wrk_dir = os.getcwd()
     temp_dir = wrk_dir + '//template'
     out_dir = wrk_dir + '//output'
@@ -42,17 +42,20 @@ def manages_files():
     try:
         temp_loc = temp_dir + '//' + os.listdir(temp_dir)[0]
     except FileNotFoundError:
+        print("\n")
         print("\u001b[1m\u001b[31mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
         done()
     try:
         in_loc = in_dir + '//' + os.listdir(in_dir)[0]
     except FileNotFoundError:
+        print("\n")
         print("\u001b[1m\u001b[31mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
         done()
     #Copying template file to output directory
     try:
         shutil.copy(temp_loc, out_dir + '//out_' + os.listdir(temp_dir)[0])
     except FileNotFoundError:
+        print("\n")
         print("\u001b[1m\u001b[31mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
     out_loc = out_dir + '//' + os.listdir(out_dir)[0]
@@ -60,7 +63,19 @@ def manages_files():
     return locations
 
 
+#Resets the text color
+def done():
+    print("\u001b[37m\u001b[0m")
+    exit()
+
+
+def progress_bar(progress, total):
+    percent = 100 * (progress / float(total))
+    bar = '█' * int(percent) + '-' * (100 - int(percent))
+    print(f"\r|{bar}| {percent:.2f}%", end="\r")
+
 def main():
+    
     file_locs = manages_files()#file_locs[template, output, input]
     
     wb = openpyxl.load_workbook(filename=file_locs[1])
@@ -89,7 +104,7 @@ def main():
     #print(len(comment_array))
     match_count = 0
     array_len = len(address_array)
-    print("\u001b[0m\u001b[36mWroking on it...")
+    print("\n\u001b[0m\u001b[36mWorking on it...")
     #loop through the addresses and compare to the csv list
     for i in range(array_len):
         for comment in comment_array:
@@ -97,25 +112,19 @@ def main():
                 ws.cell(row=address_array[i][1], column=6).value = comment[0]
                 ws.cell(row=address_array[i][1], column=7).value = comment[1]
                 match_count+=1
-            elif i % 525 == 0:#update progress
-                #sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str('{:.2f}'.format((i / array_len) * 100)) + "%")
-                #sys.stdout.flush()
+            elif i % 250 == 0:#update progress
+                progress_bar(i, array_len)
                 continue
             else:
                 pass
-    #sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str(100.00) + "%")
-    #sys.stdout.flush()
+    progress_bar(array_len, array_len)
+    print("\nDone.")
     print("\n\u001b[0m\u001b[37mNumber of comments wrote:\u001b[32m" + str(match_count))
     if match_count == 0:
         print("\u001b[33m***No matches were found. Make sure your input and template files are correct***")
     wb.save(file_locs[1])
 
     done()
-
-#Resets the text color
-def done():
-    print("\u001b[37m\u001b[0m")
-    exit()
 
 
 main()
