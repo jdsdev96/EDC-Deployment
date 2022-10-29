@@ -4,7 +4,10 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
-print("\u001b[4m\u001b[35mLayout Import Script\u001b[0m\n\n")
+print("\u001b[4m\u001b[35mLayout Import Script\u001b[0m")
+print("\u001b[37m\u001b[0mPython Version " + sys.version)
+if sys.version[:7] != "3.10.8 ":
+    print("\u001b[33m***The version of Python is different from what this script was written on. Errors may occur.***")
 
 
 def inst_openpyxl():
@@ -30,6 +33,7 @@ import openpyxl
 
 #Confirming, finding, and copying files.
 def manages_files():
+    print("\n")
     wrk_dir = os.getcwd()
     temp_dir = wrk_dir + '//template'
     out_dir = wrk_dir + '//output'
@@ -77,6 +81,7 @@ def main():
     print(address_array)
     print(len(address_array))
     """
+    #open and read the csv file.
     try:
         comment_array = list(csv.reader(open(file_locs[2], encoding= "ISO8859")))
     except PermissionError:
@@ -84,26 +89,29 @@ def main():
     #print(len(comment_array))
     match_count = 0
     array_len = len(address_array)
-    print("\u001b[33mProgress...")
+    print("\u001b[0m\u001b[36mProgress...")
+    #loop through the addresses and compare to the csv list
     for i in range(array_len):
         for comment in comment_array:
             if address_array[i][0] == comment[0]:
                 ws.cell(row=address_array[i][1], column=6).value = comment[0]
                 ws.cell(row=address_array[i][1], column=7).value = comment[1]
                 match_count+=1
-            elif i % 525 == 0:
-                sys.stdout.write(u"\u001b[37m\u001b[1000D" + str('{:.2f}'.format((i / array_len) * 100)) + "%")
+            elif i % 525 == 0:#update progress
+                sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str('{:.2f}'.format((i / array_len) * 100)) + "%")
                 sys.stdout.flush()
             else:
                 pass
-    sys.stdout.write(u"\u001b[37m\u001b[1000D" + str(100.00) + "%")
+    sys.stdout.write(u"\u001b[0m\u001b[37m\u001b[1000D" + str(100.00) + "%")
     sys.stdout.flush()
-    print("\n\u001b[37mNumber of comments wrote:\u001b[32m" + str(match_count))
+    print("\n\u001b[0m\u001b[37mNumber of comments wrote:\u001b[32m" + str(match_count))
+    if match_count == 0:
+        print("\u001b[33m***No matches were found. Make sure your input and template files are correct***")
     wb.save(file_locs[1])
 
     done()
 
-
+#Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
     exit()
