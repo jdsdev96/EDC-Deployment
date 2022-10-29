@@ -4,6 +4,8 @@ from subprocess import check_call, check_output
 import os
 import csv
 import shutil
+import time
+import concurrent.futures
 
 
 def install_openpyxl():
@@ -115,22 +117,18 @@ def get_address_comment_array_from_input(location):
 def main():
     preamble()#run preamble
 
-    #get file locations and names
     file_locs = manages_files()#file_locs[template, output, input]
 
     #open output workbook and worksheet
     wb = openpyxl.load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
-    #gather addresses that need comments
-    address_array = get_address_array_from_temp(ws)
-    #print(address_array)
-    #print(len(address_array))
-
-
-    #open and read the csv file into an array.
-    address_comment_array = get_address_comment_array_from_input(file_locs[2])
-    #print(len(comment_array))
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        f1 = executor.submit(get_address_array_from_temp, ws)
+        f2 = executor.submit(get_address_comment_array_from_input, file_locs[2])
+    address_array = f1.result()
+    address_comment_array = f2.result()
+    
     
     match_count = 0
     address_array_len = len(address_array)
