@@ -30,7 +30,7 @@ except ModuleNotFoundError:
 
 import openpyxl
 
-
+#define the progress bar class
 class progressBar:
 
     prog = 0
@@ -47,6 +47,8 @@ class progressBar:
     def __init__(self):
         pass
 
+
+#print title and check python version
 def preamble():
     os.system('color')
     print("\u001b[4m\u001b[35;1mEvents Layout Import Script\u001b[0m")
@@ -103,6 +105,7 @@ def done():
     #input("Press Enter to close window...")
     exit()
 
+
 #gets address that need comments
 def get_address_array_from_temp(sheet):
     array = []
@@ -118,6 +121,7 @@ def get_address_array_from_temp(sheet):
             pass
     return array
 
+
 #gets all address that have comments
 def get_address_comment_array_from_input(location):
     try:
@@ -127,7 +131,7 @@ def get_address_comment_array_from_input(location):
         done()
     return array
 
-
+#main code
 def main():
     preamble()#run preamble
 
@@ -149,12 +153,15 @@ def main():
 
     match_count = 0
     address_array_len = len(address_array)
+    
     print("\n\u001b[0m\u001b[32mWorking on it...",flush=True)
-    #loop through the addresses and compare to the array with comments
 
+    #set the progress bar total and start the progress bar thread
     progressBar.total = address_array_len
     t1 = threading.Thread(target=progressBar.print_progress_bar)
     t1.start()
+
+    #loop through the addresses and compare to the array with comments
     for i in range(address_array_len):
         for address in address_comment_array:
             if address_array[i][0] == address[0]:
@@ -163,18 +170,26 @@ def main():
                 match_count+=1
             else:
                 progressBar.prog = i
+    
+    #set progress on progress bar to 100
     progressBar.prog = address_array_len - 1
+    
+    #wait for progress bar thread to finish
     t1.join()
+    
+    #print the progress bar at 100%
     progressBar.print_progress_bar()
+    
     #save changes to the ouput file
     wb.save(file_locs[1])
-    #display stats
-    #progress_bar(100)
+    
+    #display stats and warning if needed
     print("\nDone.", flush=True)
     print("\n\u001b[34;1mNumber of comments found:\u001b[33m" + str(match_count))
     if match_count == 0:
         print("\u001b[33;1m***No matches were found. Make sure your input and template files are correct***")
 
+    #reset and exit()
     done()
     #end of main
 
