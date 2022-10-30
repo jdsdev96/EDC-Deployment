@@ -17,6 +17,7 @@ import threading
 
 t1 = time.perf_counter()
 
+
 #installs openpyxl using the command line
 def install_openpyxl():
     print("\u001b[33m\nInstalling openpyxl...")
@@ -38,6 +39,7 @@ except ModuleNotFoundError:
 
 
 import openpyxl
+
 
 #define the progress bar class
 class progressBar:
@@ -142,6 +144,7 @@ def get_address_comment_array_from_input(location):
         print("\u001b[1m\u001b[31mError: Could not access input file.")
         done()
     return array
+
 
 #main code
 def main():
