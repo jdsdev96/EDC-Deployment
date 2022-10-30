@@ -1,3 +1,10 @@
+#FILENAME:ImportAddresses.py
+#AUTHOR:Jonathan Shambaugh
+#PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
+#NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-Deployment
+#VERSION: v2.6.3
+#START DATE: 17 Oct 22
+
 import sys
 from subprocess import check_call, check_output
 import os
@@ -10,6 +17,7 @@ import threading
 
 t1 = time.perf_counter()
 
+#installs openpyxl using the command line
 def install_openpyxl():
     print("\u001b[33m\nInstalling openpyxl...")
     # implement pip as a subprocess:
@@ -21,6 +29,7 @@ def install_openpyxl():
 
     print(installed_packages)
 
+#check if openpyxl is installed, if not, install it
 try:
     import openpyxl
 except ModuleNotFoundError:
@@ -43,6 +52,7 @@ class progressBar:
             print(f"\r|{bar}| {percent:.0f}%", end="\r", flush=True)
             if percent == 100:
                 break
+        return None
 
     def __init__(self):
         pass
@@ -53,8 +63,9 @@ def preamble():
     os.system('color')
     print("\u001b[4m\u001b[35;1mEvents Layout Import Script\u001b[0m")
     #print("\u001b[37m\u001b[0mPython Version " + sys.version)
-    if sys.version[:7] != "3.10.8 ":
+    if sys.version[:4] != "3.10":
         print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
+        return None
 
 
 #Confirming, finding, and copying files.
