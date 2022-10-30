@@ -1,11 +1,14 @@
-from codecs import raw_unicode_escape_decode
 import sys
 from subprocess import check_call, check_output
 import os
 import csv
 import shutil
 import time
+import concurrent.futures
+import threading
 
+
+t1 = time.perf_counter()
 
 def install_openpyxl():
     print("\u001b[33m\nInstalling openpyxl...")
@@ -28,12 +31,28 @@ except ModuleNotFoundError:
 import openpyxl
 
 
+class progressBar:
+
+    prog = 0
+    total = 0
+        
+    def print_progress_bar():
+        while progressBar.prog < progressBar.total:
+            percent = round((progressBar.prog / progressBar.total) * 100)
+            bar = '█' * int(percent) + '-' * (100 - int(percent))#'█'
+            print(f"\r|{bar}| {percent:.0f}%", end="\r", flush=True)
+            if percent == 100:
+                break
+
+    def __init__(self):
+        pass
+
 def preamble():
     os.system('color')
-    print("\u001b[4m\u001b[35;1mLayout Import Script\u001b[0m")
-    print("\u001b[37m\u001b[0mPython Version " + sys.version)
+    print("\u001b[4m\u001b[35;1mEvents Layout Import Script\u001b[0m")
+    #print("\u001b[37m\u001b[0mPython Version " + sys.version)
     if sys.version[:7] != "3.10.8 ":
-        print("\u001b[33;1m***The version of Python is different from what this script was written on. Errors may occur.***")
+        print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
 
 
 #Confirming, finding, and copying files.
@@ -76,15 +95,11 @@ def manages_files():
     return locations
 
 
-def progress_bar(progress, total):
-    percent = 100 * (progress / float(total))
-    bar = '█' * int(percent) + '-' * (100 - int(percent))
-    print(f"\r|{bar}| {percent:.2f}%", end="\r")
-
-
 #Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
+    t2 = time.perf_counter()
+    print(t2 - t1)
     #input("Press Enter to close window...")
     exit()
 
@@ -116,45 +131,47 @@ def get_address_comment_array_from_input(location):
 def main():
     preamble()#run preamble
 
-    #get file locations and names
     file_locs = manages_files()#file_locs[template, output, input]
 
     #open output workbook and worksheet
     wb = openpyxl.load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
-    #gather addresses that need comments
-    address_array = get_address_array_from_temp(ws)
-    #print(address_array)
-    #print(len(address_array))
+    #get address that need comments from template and get addresses with comments from input in seperate threads
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        f1 = executor.submit(get_address_array_from_temp, ws)
+        f2 = executor.submit(get_address_comment_array_from_input, file_locs[2])
+    #wait for results from both threads
+    address_array = f1.result()
+    address_comment_array = f2.result()
+    #close executor
+    executor.shutdown()
 
-
-    #open and read the csv file into an array.
-    address_comment_array = get_address_comment_array_from_input(file_locs[2])
-    #print(len(comment_array))
-    
     match_count = 0
     address_array_len = len(address_array)
-    print("\n\u001b[0m\u001b[32mWorking on it...")
+    print("\n\u001b[0m\u001b[32mWorking on it...",flush=True)
     #loop through the addresses and compare to the array with comments
+
+    progressBar.total = address_array_len
+    t1 = threading.Thread(target=progressBar.print_progress_bar)
+    t1.start()
     for i in range(address_array_len):
         for address in address_comment_array:
             if address_array[i][0] == address[0]:
                 ws.cell(row=address_array[i][1], column=6).value = address[0]
                 ws.cell(row=address_array[i][1], column=7).value = address[1]
                 match_count+=1
-            elif i % 250 == 0:#update progress
-                progress_bar(i, address_array_len)
-                continue
             else:
-                pass
+                progressBar.prog = i
+    progressBar.prog = address_array_len - 1
+    t1.join()
+    progressBar.print_progress_bar()
     #save changes to the ouput file
     wb.save(file_locs[1])
-
     #display stats
-    progress_bar(address_array_len, address_array_len)
-    print("\nDone.")
-    print("\n\u001b[34;1mNumber of comments wrote:\u001b[33m" + str(match_count))
+    #progress_bar(100)
+    print("\nDone.", flush=True)
+    print("\n\u001b[34;1mNumber of comments found:\u001b[33m" + str(match_count))
     if match_count == 0:
         print("\u001b[33;1m***No matches were found. Make sure your input and template files are correct***")
 
