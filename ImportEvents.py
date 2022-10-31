@@ -124,15 +124,7 @@ def done():
 def get_address_array_from_temp(sheet):
     array = []
     for i in range(sheet.max_row):
-        addy = sheet.cell(i+3,2).value
-        if type(addy) != str:
-            continue
-        elif addy[0:3] == "GMF":
-            array.append([addy, i + 3])# [0]requested address [1]position
-        elif addy[0:2] == "EM":
-            array.append([addy, i + 3])#adding 3 to index number to offset for formating of template
-        else:
-            pass
+        array.append([sheet.cell(i+3,2).value, i + 3])
     return array
 
 
@@ -183,6 +175,20 @@ def main():
                 ws.cell(row=address_array[i][1], column=6).value = address[0]
                 ws.cell(row=address_array[i][1], column=7).value = address[1]
                 match_count+=1
+            elif address[0][:4] == "P1-X":
+                if address_array[i][0] == address[0][3:]:
+                    ws.cell(row=address_array[i][1], column=6).value = address[0][3:]
+                    ws.cell(row=address_array[i][1], column=7).value = address[1]
+                    match_count+=1
+                else:
+                    continue
+            elif address[0][:4] == "P2-D":
+                if address_array[i][0] == address[0][3:]:
+                    ws.cell(row=address_array[i][1], column=6).value = address[0][3:]
+                    ws.cell(row=address_array[i][1], column=7).value = address[1]
+                    match_count+=1
+                else:
+                    continue
             else:
                 progressBar.prog = i
     
