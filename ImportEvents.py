@@ -1,4 +1,4 @@
-#FILENAME:ImportAddresses.py
+#FILENAME:ImportEvents.py
 #AUTHOR:Jonathan Shambaugh
 #PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
 #NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-Deployment
@@ -63,7 +63,7 @@ class progressBar:
 #print title and check python version
 def preamble():
     os.system('color')
-    print("\u001b[4m\u001b[35;1mEvents Layout Import Script\u001b[0m")
+    print("\u001b[4m\u001b[35;1mEvents Layout Import Tool\u001b[0m")
     #print("\u001b[37m\u001b[0mPython Version " + sys.version)
     if sys.version[:4] != "3.10":
         print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
