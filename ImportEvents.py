@@ -2,7 +2,7 @@
 #AUTHOR:Jonathan Shambaugh
 #PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
 #NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-Deployment
-#VERSION: v2.7.3
+#VERSION: v2.7.5
 #START DATE: 17 Oct 22
 
 from sys import executable, version
@@ -71,9 +71,7 @@ def preamble():
 #Confirming, finding, and copying files.
 def manages_files():
     wrk_dir = getcwd()
-    temp_dir = wrk_dir + '//template'
-    out_dir = wrk_dir + '//output'
-    in_dir = wrk_dir + '//input'
+    temp_dir, out_dir, in_dir = wrk_dir + '//template', wrk_dir + '//output', wrk_dir + '//input'
     #confirming files
     try:
         temp_loc = temp_dir + '//' + listdir(temp_dir)[0]
@@ -110,9 +108,8 @@ def manages_files():
 #Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
-    t2 = perf_counter()
-    time_elapsed = round((t2 - t1), 3)
-    print("Execution time: " + f"{time_elapsed}" + "sec(s)")
+    time_elapsed = round((perf_counter() - t1), 3)
+    print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
     input("Press Enter to close window...")
     exit()
 
@@ -155,8 +152,7 @@ def main():
     #close executor
     executor.shutdown()
 
-    match_count = 0
-    address_array_len = len(address_array)
+    match_count, address_array_len = 0, len(address_array)
     
     print("\n\u001b[0m\u001b[32mWorking on it...",flush=True)
 
