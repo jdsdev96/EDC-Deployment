@@ -116,7 +116,7 @@ def done():
     t2 = time.perf_counter()
     time_elapsed = round((t2 - t1), 3)
     print("Execution time: " + f"{time_elapsed}" + "sec(s)")
-    #input("Press Enter to close window...")
+    input("Press Enter to close window...")
     exit()
 
 
