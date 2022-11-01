@@ -5,40 +5,38 @@
 #VERSION: v2.7.3
 #START DATE: 17 Oct 22
 
-import sys
+from sys import executable, version
 from subprocess import check_call, check_output
-import os
-import csv
-import shutil
-import time
-import concurrent.futures
-import threading
+from os import system, getcwd, listdir
+from csv import reader
+from shutil import copy
+from time import perf_counter
+from concurrent.futures import ThreadPoolExecutor
+from threading import Thread
 
 
-t1 = time.perf_counter()
+t1 = perf_counter()
 
 
 #installs openpyxl using the command line
 def install_openpyxl():
     print("\u001b[33m\nInstalling openpyxl...")
     # implement pip as a subprocess:
-    check_call([sys.executable, '-m', 'pip', 'install', 'openpyxl'])
+    check_call([executable, '-m', 'pip', 'install', 'openpyxl'])
 
     # process output with an API in the subprocess module:
-    reqs = check_output([sys.executable, '-m', 'pip','freeze'])
+    reqs = check_output([executable, '-m', 'pip','freeze'])
     installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
 
     print(installed_packages)
 
 #check if openpyxl is installed, if not, install it
 try:
-    import openpyxl
+    from openpyxl import load_workbook
 except ModuleNotFoundError:
     print("\u001b[31;1mOpenpyxl library is not installed.")
     install_openpyxl()
-
-
-import openpyxl
+    from openpyxl import load_workbook
 
 
 #define the progress bar class
@@ -62,23 +60,23 @@ class progressBar:
 
 #print title and check python version
 def preamble():
-    os.system('color')
+    system('color')
     print("\u001b[4m\u001b[35;1mEvents Layout Import Tool\u001b[0m")
-    #print("\u001b[37m\u001b[0mPython Version " + sys.version)
-    if sys.version[:4] != "3.10":
+    #print("\u001b[37m\u001b[0mPython Version " + version)
+    if version[:4] != "3.10":
         print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
         return None
 
 
 #Confirming, finding, and copying files.
 def manages_files():
-    wrk_dir = os.getcwd()
+    wrk_dir = getcwd()
     temp_dir = wrk_dir + '//template'
     out_dir = wrk_dir + '//output'
     in_dir = wrk_dir + '//input'
     #confirming files
     try:
-        temp_loc = temp_dir + '//' + os.listdir(temp_dir)[0]
+        temp_loc = temp_dir + '//' + listdir(temp_dir)[0]
     except FileNotFoundError:
         print("\n")
         print("\u001b[1m\u001b[31;1mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
@@ -88,7 +86,7 @@ def manages_files():
         print("\u001b[1m\u001b[31;1mThe template file was not found.\n\nPlease add the template file to the template directory and restart.")
         done()
     try:
-        in_loc = in_dir + '//' + os.listdir(in_dir)[0]
+        in_loc = in_dir + '//' + listdir(in_dir)[0]
     except FileNotFoundError:
         print("\n")
         print("\u001b[1m\u001b[31;1mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
@@ -99,13 +97,12 @@ def manages_files():
         done()
     #Copying template file to output directory
     try:
-        shutil.copy(temp_loc, out_dir + '//out_' + os.listdir(temp_dir)[0])
+        copy(temp_loc, out_dir + '//out_' + listdir(temp_dir)[0])
     except FileNotFoundError:
-        
         print("\n")
         print("\u001b[1m\u001b[31;1mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
-    out_loc = out_dir + '//' + os.listdir(out_dir)[0]
+    out_loc = out_dir + '//' + listdir(out_dir)[0]
     locations = [temp_loc, out_loc, in_loc]
     return locations
 
@@ -113,7 +110,7 @@ def manages_files():
 #Resets the text color
 def done():
     print("\u001b[37m\u001b[0m")
-    t2 = time.perf_counter()
+    t2 = perf_counter()
     time_elapsed = round((t2 - t1), 3)
     print("Execution time: " + f"{time_elapsed}" + "sec(s)")
     input("Press Enter to close window...")
@@ -131,7 +128,7 @@ def get_address_array_from_temp(sheet):
 #gets all address that have comments
 def get_address_comment_array_from_input(location):
     try:
-        array = list(csv.reader(open(location, encoding= "ISO8859")))
+        array = list(reader(open(location, encoding= "ISO8859")))
     except PermissionError:
         print("\u001b[1m\u001b[31mError: Could not access input file.")
         done()
@@ -145,11 +142,11 @@ def main():
     file_locs = manages_files()#file_locs[template, output, input]
 
     #open output workbook and worksheet
-    wb = openpyxl.load_workbook(filename=file_locs[1])
+    wb = load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
     #get address that need comments from template and get addresses with comments from input in seperate threads
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor() as executor:
         f1 = executor.submit(get_address_array_from_temp, ws)
         f2 = executor.submit(get_address_comment_array_from_input, file_locs[2])
     #wait for results from both threads
@@ -165,7 +162,7 @@ def main():
 
     #set the progress bar total and start the progress bar thread
     progressBar.total = address_array_len
-    t1 = threading.Thread(target=progressBar.print_progress_bar)
+    t1 = Thread(target=progressBar.print_progress_bar)
     t1.start()
 
     #loop through the addresses and compare to the array with comments
