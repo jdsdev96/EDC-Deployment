@@ -7,7 +7,7 @@
 
 from sys import executable, version
 from subprocess import check_call, check_output
-from os import system, getcwd, listdir
+from os import system, getcwd, listdir, access, R_OK, W_OK
 from csv import reader
 from shutil import copy
 from time import perf_counter
@@ -44,7 +44,7 @@ class progressBar:
 
     prog = 0
     total = 0
-        
+
     def print_progress_bar():
         while progressBar.prog < progressBar.total:
             percent = round((progressBar.prog / progressBar.total) * 100)
@@ -77,7 +77,7 @@ def manages_files():
         temp_loc = temp_dir + '//' + listdir(temp_dir)[0]
     except FileNotFoundError:
         print("\n")
-        print("\u001b[1m\u001b[31;1mThe template file or directory was not found.\n\nPlease add the template file to the template directory and restart.")
+        print("\u001b[1m\u001b[31;1mThe template directory was not found.\n\nPlease add the template directory and restart.")
         done()
     except IndexError:
         print("\n")
@@ -100,9 +100,24 @@ def manages_files():
         print("\n")
         print("\u001b[1m\u001b[31;1mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
+    
     out_loc = out_dir + '//' + listdir(out_dir)[0]
     locations = [temp_loc, out_loc, in_loc]
     return locations
+
+
+def perm_check(locs):
+    file_names = ["template", "output", "input"]
+    access_type = ["read", "write"]
+    for i in range(len(locs)):
+        permissions = [access(locs[i], R_OK), access(locs[i], W_OK)]
+        for j in range(len(permissions)):
+            if not permissions[j]:
+                print(f"\u001b[1m\u001b[31;1mThe script does not have {access_type[j]} to the {file_names[i]} file.")
+            else:
+                continue
+        continue
+    return None
 
 
 #Resets the text color
@@ -134,9 +149,14 @@ def get_address_comment_array_from_input(location):
 
 #main code
 def main():
-    preamble()#run preamble
+    #run preamble
+    preamble()
 
+    #find file locations
     file_locs = manages_files()#file_locs[template, output, input]
+
+    #check permissions on files
+    perm_check(file_locs)
 
     #open output workbook and worksheet
     wb = load_workbook(filename=file_locs[1])
