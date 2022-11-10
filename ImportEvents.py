@@ -127,7 +127,7 @@ def perm_check(locs):
         permissions = [access(locs[i], R_OK), access(locs[i], W_OK)]
         for j in range(len(permissions)):
             if not permissions[j]:
-                print(f"\u001b[1m\u001b[31;1mThe script does not have {access_type[j]} to the {file_names[i]} file.")
+                print(f"\u001b[1m\u001b[31;1mThe script does not have {access_type[j]} to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
             else:
                 continue
         continue
