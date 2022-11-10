@@ -50,20 +50,18 @@ except ModuleNotFoundError:
 #define the progress bar class
 class progressBar:
 
-    prog = 0
-    total = 0
-
-    def print_progress_bar():
-        while progressBar.prog < progressBar.total:
-            percent = round((progressBar.prog / progressBar.total) * 100)
+    def print_progress_bar(self):
+        while self.prog < self.total:
+            percent = round((self.prog / self.total) * 100)
             bar = '█' * int(percent) + '-' * (100 - int(percent))#'█'
             print(f"\r|{bar}| {percent:.0f}%", end="\r", flush=True)
             if percent == 100:
                 break
         return None
 
-    def __init__(self):
-        pass
+    def __init__(self, prog, total):
+        self.prog = prog
+        self.total = total
 
 
 #print title and check python version
@@ -197,8 +195,8 @@ def main():
     print("\n\u001b[0m\u001b[32mWorking on it...",flush=True)
 
     #set the progress bar total and start the progress bar thread
-    progressBar.total = address_array_len
-    t1 = Thread(target=progressBar.print_progress_bar)
+    address_prog_bar = progressBar(0, address_array_len)
+    t1 = Thread(target=address_prog_bar.print_progress_bar)
     t1.start()
 
     #loop through the addresses and compare to the array with comments
@@ -223,16 +221,16 @@ def main():
                 else:
                     continue
             else:
-                progressBar.prog = i
+                address_prog_bar.prog = i
     
     #set progress on progress bar to 100
-    progressBar.prog = address_array_len - 1
+    address_prog_bar.prog = address_array_len - 1
     
     #wait for progress bar thread to finish
     t1.join()
     
     #print the progress bar at 100%
-    progressBar.print_progress_bar()
+    address_prog_bar.print_progress_bar()
     
     #save changes to the ouput file
     wb.save(file_locs[1])
