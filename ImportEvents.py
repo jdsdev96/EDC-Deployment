@@ -1,8 +1,8 @@
 #FILENAME:ImportEvents.py
 #AUTHOR:Jonathan Shambaugh
 #PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
-#NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-Deployment
-#VERSION: v2.7.5
+#NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-ImportEventsTool
+#VERSION: v2.7.8
 #START DATE: 17 Oct 22
 
 from sys import executable, version
