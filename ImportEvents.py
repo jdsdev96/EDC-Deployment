@@ -78,7 +78,8 @@ def preamble():
     owner = "jdsdev96"
     repo = "EDC-ImportEventsTool"
     response = get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
-    if v != response.json()["name"]:
+    #print(response.json())
+    if v != response.json()["tag_name"]:
         print("\u001b[33;1m***There is a new release of this tool.***")
 
 
