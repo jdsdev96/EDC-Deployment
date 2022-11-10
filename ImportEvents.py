@@ -15,14 +15,16 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 
 
+v = "v1.1.0"
+
 t1 = perf_counter()
 
 
 #installs openpyxl using the command line
-def install_openpyxl():
+def install_lib(lib):
     print("\u001b[33m\nInstalling openpyxl...")
     # implement pip as a subprocess:
-    check_call([executable, '-m', 'pip', 'install', 'openpyxl'])
+    check_call([executable, '-m', 'pip', 'install', lib])
 
     # process output with an API in the subprocess module:
     reqs = check_output([executable, '-m', 'pip','freeze'])
@@ -35,9 +37,14 @@ try:
     from openpyxl import load_workbook
 except ModuleNotFoundError:
     print("\u001b[31;1mOpenpyxl library is not installed.")
-    install_openpyxl()
+    install_lib("Openpyxl")
     from openpyxl import load_workbook
-
+try:
+    from requests import get
+except ModuleNotFoundError:
+    print("\u001b[31;1mRequests library is not installed.")
+    install_lib("requests")
+    from requests import get
 
 #define the progress bar class
 class progressBar:
@@ -62,10 +69,16 @@ class progressBar:
 def preamble():
     system('color')
     print("\u001b[4m\u001b[35;1mEvents Layout Import Tool\u001b[0m")
-    #print("\u001b[37m\u001b[0mPython Version " + version)
+    print(v)
+    print("\u001b[37m\u001b[0mPython Version: " + version[:7])
     if version[:4] != "3.10":
         print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
         return None
+    owner = "jdsdev96"
+    repo = "EDC-ImportEventsTool"
+    response = get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
+    if v != response.json()["name"]:
+        print("\u001b[33;1m***There is a new release of this tool.***")
 
 
 #Confirming, finding, and copying files.
