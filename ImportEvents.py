@@ -77,10 +77,13 @@ def preamble():
         return None
     owner = "jdsdev96"
     repo = "EDC-ImportEventsTool"
-    response = get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
-    #print(response.json())
-    if v != response.json()["tag_name"]:
-        print("\u001b[33;1m***There is a new release of this tool.***")
+    try:
+        response = get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
+        #print(response.json())
+        if v != response.json()["tag_name"]:
+            print("\u001b[33;1m***Warning: There is a new release of this tool.***")
+    except:
+        print("\u001b[33;1m***Warning: Could not connect to repository. Version check failed.***")
 
 
 #Confirming, finding, and copying files.
