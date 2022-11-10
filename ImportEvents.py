@@ -125,7 +125,7 @@ def done():
     print("\u001b[37m\u001b[0m")
     time_elapsed = round((perf_counter() - t1), 3)
     print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
-    env = "idlelib" in modules
+    env = "idlelib" in modules#checks if script is running in IDLE. True = runnning in IDLE. False = running elsewhere
     if env:
         input("Press Enter to close window...")
     exit()
