@@ -5,7 +5,7 @@
 #VERSION: v2.7.8
 #START DATE: 17 Oct 22
 
-from sys import executable, version
+from sys import executable, version, modules
 from subprocess import check_call, check_output
 from os import system, getcwd, listdir, access, R_OK, W_OK
 from csv import reader
@@ -125,7 +125,9 @@ def done():
     print("\u001b[37m\u001b[0m")
     time_elapsed = round((perf_counter() - t1), 3)
     print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
-    input("Press Enter to close window...")
+    env = "idlelib" in modules
+    if env:
+        input("Press Enter to close window...")
     exit()
 
 
