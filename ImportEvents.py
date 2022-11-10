@@ -2,7 +2,7 @@
 #AUTHOR:Jonathan Shambaugh
 #PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
 #NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-ImportEventsTool
-#VERSION: v1.0.0
+#VERSION: v1.1.0
 #START DATE: 17 Oct 22
 
 from sys import executable, version, modules
@@ -17,12 +17,13 @@ from threading import Thread
 
 v = "v1.1.0"
 
+
 t1 = perf_counter()
 
 
 #installs openpyxl using the command line
 def install_lib(lib):
-    print("\u001b[33m\nInstalling openpyxl...")
+    print(f"\u001b[33m\nInstalling {lib}...")
     # implement pip as a subprocess:
     check_call([executable, '-m', 'pip', 'install', lib])
 
