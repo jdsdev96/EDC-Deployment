@@ -2,7 +2,7 @@
 #AUTHOR:Jonathan Shambaugh
 #PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
 #NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-ImportEventsTool
-#VERSION: v1.1.0
+#VERSION: v1.2.1
 #START DATE: 17 Oct 22
 
 from sys import executable, version, modules
@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 
 
-v = "v1.1.0"
+v = "v1.2.1"
 
 
 t1 = perf_counter()
