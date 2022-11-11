@@ -13,6 +13,7 @@ from shutil import copy
 from time import perf_counter
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
+from msvcrt import getch, kbhit
 
 
 v = "v1.2.2"
@@ -62,6 +63,19 @@ class progressBar:
     def __init__(self, prog, total):
         self.prog = prog
         self.total = total
+
+
+
+def get_current_cursor_pos():
+    print("\n")
+    print("\033[A\033[6n")
+    keep_going = True
+    buff = ""
+    while keep_going:
+        buff += getch().decode("ASCII")
+        keep_going = kbhit()
+    newbuff =buff.replace("\x1b[", "")
+    return [newbuff[0], newbuff[2]]
 
 
 #print title and check python version
