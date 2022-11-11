@@ -7,7 +7,7 @@
 
 from sys import executable, version, modules
 from subprocess import check_call, check_output
-from os import system, getcwd, listdir, access, R_OK, W_OK
+from os import system, getcwd, listdir, access, R_OK, W_OK, getenv, environ
 from csv import reader
 from shutil import copy
 from time import perf_counter
@@ -83,19 +83,23 @@ def preamble():
     system('color')
     print("\u001b[4m\u001b[35;1mEvents Layout Import Tool\u001b[0m")
     print(v)
-    print("\u001b[37m\u001b[0mPython Version: " + version[:7])
+    #print("\u001b[37m\u001b[0mPython Version: " + version[:7])
     if version[:4] != "3.10":
         print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
         return None
     owner = "jdsdev96"
     repo = "EDC-ImportEventsTool"
+    print("Checking for updates...", end="")
     try:
         response = get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
         #print(response.json())
+        print("[DONE]")
         if v != response.json()["tag_name"]:
             print("\u001b[33;1m***Warning: There is a new release of this tool.***")
     except:
+        print("[FAILED]")
         print("\u001b[33;1m***Warning: Could not connect to repository. Version check failed.***")
+    #print(environ)
 
 
 #Confirming, finding, and copying files.
@@ -155,9 +159,10 @@ def done():
     print("\u001b[37m\u001b[0m")
     time_elapsed = round((perf_counter() - t1), 3)
     print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
-    env = "idlelib" in modules#checks if script is running in IDLE. True = runnning in IDLE. False = running elsewhere.
+    env = "idle" in modules#checks if script is running in IDLE. True = runnning in IDLE. False = running elsewhere.
     if env:
         input("Press Enter to close window...")
+    #input("throwaway")
     exit()
 
 
