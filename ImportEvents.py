@@ -5,9 +5,9 @@
 #VERSION: v1.2.2
 #START DATE: 17 Oct 22
 
-from sys import executable, version, modules
+from sys import executable, version
 from subprocess import check_call, check_output
-from os import system, getcwd, listdir, access, R_OK, W_OK, getenv, environ
+from os import system, getcwd, listdir, access, R_OK, W_OK, X_OK, stat
 from csv import reader
 from shutil import copy
 from time import perf_counter
@@ -16,10 +16,12 @@ from threading import Thread
 from msvcrt import getch, kbhit
 
 
+
 v = "v1.2.2"
 
 
 t1 = perf_counter()
+
 
 
 #installs openpyxl using the command line
@@ -48,6 +50,7 @@ except ModuleNotFoundError:
     install_lib("requests")
     from requests import get
 
+
 #define the progress bar class
 class progressBar:
 
@@ -66,16 +69,12 @@ class progressBar:
 
 
 
-def get_current_cursor_pos():
-    print("\n")
-    print("\033[A\033[6n")
-    keep_going = True
-    buff = ""
-    while keep_going:
-        buff += getch().decode("ASCII")
-        keep_going = kbhit()
-    newbuff =buff.replace("\x1b[", "")
-    return [newbuff[0], newbuff[2]]
+class TemplateCache:
+
+    def __init__(self, array, modified):
+        self.array = array
+        self.modified = modified
+
 
 
 #print title and check python version
@@ -89,7 +88,7 @@ def preamble():
         return None
     owner = "jdsdev96"
     repo = "EDC-ImportEventsTool"
-    print("Checking for updates...", end="")
+    print("Checking for updates...", end="",flush=True)
     try:
         response = get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
         #print(response.json())
@@ -100,6 +99,18 @@ def preamble():
         print("[FAILED]")
         print("\u001b[33;1m***Warning: Could not connect to repository. Version check failed.***")
     #print(environ)
+
+
+def get_current_cursor_pos():
+    print("\n")
+    print("\033[A\033[6n")
+    keep_going = True
+    buff = ""
+    while keep_going:
+        buff += getch().decode("ASCII")
+        keep_going = kbhit()
+    newbuff =buff.replace("\x1b[", "")
+    return [newbuff[0], newbuff[2]]
 
 
 #Confirming, finding, and copying files.
@@ -134,7 +145,11 @@ def manages_files():
         print("\n")
         print("\u001b[1m\u001b[31;1mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
-    
+    except Exception as e:
+        print(e)
+        done()
+
+
     out_loc = out_dir + '//' + listdir(out_dir)[0]
     locations = [temp_loc, out_loc, in_loc]
     return locations
@@ -142,28 +157,17 @@ def manages_files():
 
 def perm_check(locs):
     file_names = ["template", "output", "input"]
-    access_type = ["read", "write"]
+    access_type = ["read", "write", "execute"]
     for i in range(len(locs)):
-        permissions = [access(locs[i], R_OK), access(locs[i], W_OK)]
+        permissions = [access(locs[i], R_OK), access(locs[i], W_OK), access(locs[i], X_OK)]
         for j in range(len(permissions)):
             if not permissions[j]:
-                print(f"\u001b[1m\u001b[31;1mThe script does not have {access_type[j]} to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
+                print(f"\u001b[1m\u001b[31;1mThe script does not have {access_type[j]} access to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
             else:
+                #print(f"\u001b[1m\u001b[31;1mThe script does have {access_type[j]} access to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
                 continue
         continue
     return None
-
-
-#Resets the text color
-def done():
-    print("\u001b[37m\u001b[0m")
-    time_elapsed = round((perf_counter() - t1), 3)
-    print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
-    env = "idle" in modules#checks if script is running in IDLE. True = runnning in IDLE. False = running elsewhere.
-    if env:
-        input("Press Enter to close window...")
-    #input("throwaway")
-    exit()
 
 
 #gets address that need comments
@@ -182,6 +186,15 @@ def get_address_comment_array_from_input(location):
         print("\u001b[1m\u001b[31mError: Could not access input file.")
         done()
     return array
+
+
+#Resets the text color
+def done():
+    print("\u001b[37m\u001b[0m")
+    time_elapsed = round((perf_counter() - t1), 3)
+    print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
+    #input("throwaway")
+    exit()
 
 
 #main code
