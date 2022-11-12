@@ -69,14 +69,6 @@ class progressBar:
 
 
 
-class TemplateCache:
-
-    def __init__(self, array, modified):
-        self.array = array
-        self.modified = modified
-
-
-
 #print title and check python version
 def preamble():
     system('color')
