@@ -55,10 +55,11 @@ except ModuleNotFoundError:
 class progressBar:
 
     def print_progress_bar(self):
+        curs = get_current_cursor_pos()
         while self.prog < self.total:
             percent = round((self.prog / self.total) * 100)
             bar = '█' * int(percent) + '-' * (100 - int(percent))#'█'
-            print(f"\r|{bar}| {percent:.0f}%", end="\r", flush=True)
+            print(f"\033[{curs[0]};{curs[1]}f|{bar}| {percent:.0f}%", flush=True)
             if percent == 100:
                 break
         return None
@@ -102,7 +103,12 @@ def get_current_cursor_pos():
         buff += getch().decode("ASCII")
         keep_going = kbhit()
     newbuff =buff.replace("\x1b[", "")
-    return [newbuff[0], newbuff[2]]
+    if len(newbuff) == 5:
+        return [newbuff[:2], newbuff[3]]
+    elif len(newbuff) == 4:
+        return [newbuff[0], newbuff[2]]
+    else:
+        return [0,0]
 
 
 #Confirming, finding, and copying files.
@@ -217,7 +223,7 @@ def main():
 
     match_count, address_array_len = 0, len(address_array)
     
-    print("\n\u001b[0m\u001b[32mWorking on it...",flush=True)
+    print("\n\u001b[0m\u001b[32mWorking on it...",flush=True, end="")
 
     #set the progress bar total and start the progress bar thread
     address_prog_bar = progressBar(0, address_array_len)
@@ -249,13 +255,10 @@ def main():
                 address_prog_bar.prog = i
     
     #set progress on progress bar to 100
-    address_prog_bar.prog = address_array_len - 1
+    address_prog_bar.prog = address_array_len
     
     #wait for progress bar thread to finish
     t1.join()
-    
-    #print the progress bar at 100%
-    address_prog_bar.print_progress_bar()
     
     #save changes to the output file
     wb.save(file_locs[1])
