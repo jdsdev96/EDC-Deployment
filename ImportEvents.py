@@ -2,7 +2,7 @@
 #AUTHOR:Jonathan Shambaugh
 #PURPOSE: To extract the comments given in a Toyopuc project and write them to the corresponding address in the template for easy event importing.
 #NOTES: See the github repository for more info. https://github.com/jdsdev96/EDC-ImportEventsTool
-#VERSION: v1.2.2
+#VERSION: v1.2.3
 #START DATE: 17 Oct 22
 
 from sys import executable, version
@@ -17,7 +17,7 @@ from msvcrt import getch, kbhit
 
 
 
-v = "v1.2.2"
+v = "v1.2.3"
 
 
 t1 = perf_counter()
@@ -205,7 +205,7 @@ def main():
     wb = load_workbook(filename=file_locs[1])
     ws = wb["Import Cheat Sheet"]
 
-    #get address that need comments from template and get addresses with comments from input in seperate threads
+    #get address that need comments from template and get addresses with comments from input in separate threads
     with ThreadPoolExecutor() as executor:
         f1 = executor.submit(get_address_array_from_temp, ws)
         f2 = executor.submit(get_address_comment_array_from_input, file_locs[2])
@@ -257,7 +257,7 @@ def main():
     #print the progress bar at 100%
     address_prog_bar.print_progress_bar()
     
-    #save changes to the ouput file
+    #save changes to the output file
     wb.save(file_locs[1])
     
     #display stats and warning if needed
