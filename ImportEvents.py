@@ -138,6 +138,7 @@ def manages_files():
         print("\u001b[1m\u001b[31;1mThe output directory was not found.\n\nPlease add the output directory and restart.")
         done()
     except Exception as e:
+        print("Make sure to close the template file or make sure template file is not being used by another program.")
         print(e)
         done()
 
