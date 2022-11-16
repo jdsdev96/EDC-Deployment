@@ -17,14 +17,13 @@ from msvcrt import getch, kbhit
 
 
 
-Colors = {
-    "Black": "\u001b[30m"
-}
-
-Text_Formatting = {
+Ansi = {
+    "Black": "\u001b[30m",
+    "Red": "\u001b[31m",
     "Bold": "\u001b[1m",
     "Reset": "\u001b[1m"
 }
+
 
 
 v = "v1.2.3"
