@@ -17,6 +17,16 @@ from msvcrt import getch, kbhit
 
 
 
+Colors = {
+    "Black": "\u001b[30m"
+}
+
+Text_Formatting = {
+    "Bold": "\u001b[1m",
+    "Reset": "\u001b[1m"
+}
+
+
 v = "v1.2.3"
 
 
