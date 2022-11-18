@@ -17,11 +17,26 @@ from msvcrt import getch, kbhit
 
 
 
-Ansi = {
+ansi = {
     "Black": "\u001b[30m",
     "Red": "\u001b[31m",
+    "Green": "\u001b[32m",
+    "Yellow": "\u001b[33m",
+    "Blue": "\u001b[34m",
+    "Magenta": "\u001b[35m",
+    "Cyan": "\u001b[36m",
+    "White": "\u001b[37m",
+    "Bright Black": "\u001b[30;1m",
+    "Bright Red": "\u001b[31;1m",
+    "Bright Green": "\u001b[32;1m",
+    "Bright Yellow": "\u001b[33;1m",
+    "Bright Blue": "\u001b[34;1m",
+    "Bright Magenta": "\u001b[35;1m",
+    "Bright Cyan": "\u001b[36;1m",
+    "Bright White": "\u001b[37;1m",
     "Bold": "\u001b[1m",
-    "Reset": "\u001b[1m"
+    "Underline": "\u001b[4m",
+    "Reset": "\u001b[0m"
 }
 
 
@@ -82,11 +97,11 @@ class progressBar:
 #print title and check python version
 def preamble():
     system('color')
-    print("\u001b[4m\u001b[35;1mEvents Layout Import Tool\u001b[0m")
+    print(f"{ansi['Underline']}{ansi['Bright Magenta']}Events Layout Import Tool{ansi['Reset']}")
     print(v)
     #print("\u001b[37m\u001b[0mPython Version: " + version[:7])
     if version[:4] != "3.10":
-        print("\u001b[33;1m***Warning: The version of Python is different from what this script was written on.***")
+        print(f"{ansi['Bright Yellow']}***Warning: The version of Python is different from what this script was written on.***{ansi['Reset']}")
         return None
     owner = "jdsdev96"
     repo = "EDC-ImportEventsTool"
@@ -96,7 +111,7 @@ def preamble():
         #print(response.json())
         print("[DONE]")
         if v != response.json()["tag_name"]:
-            print("\u001b[33;1m***Warning: There is a new release of this tool.***")
+            print(f"{ansi['Bright Yellow']}***Warning: There is a new release of this tool.***")
     except:
         print("[FAILED]")
         print("\u001b[33;1m***Warning: Could not connect to repository. Version check failed.***")
