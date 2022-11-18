@@ -7,7 +7,7 @@
 
 from sys import executable, version
 from subprocess import check_call, check_output
-from os import system, getcwd, listdir, access, R_OK, W_OK, X_OK, stat
+from os import system, getcwd, listdir, access, R_OK, W_OK, X_OK
 from csv import reader
 from shutil import copy
 from time import perf_counter
@@ -50,13 +50,13 @@ t1 = perf_counter()
 
 #installs openpyxl using the command line
 def install_lib(lib):
-    print(f"\u001b[33m\nInstalling {lib}...")
+    print(f"{ansi['Yellow']}\nInstalling {lib}...")
     # implement pip as a subprocess:
     check_call([executable, '-m', 'pip', 'install', lib])
 
     # process output with an API in the subprocess module:
-    reqs = check_output([executable, '-m', 'pip','freeze'])
-    installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
+    requests = check_output([executable, '-m', 'pip','freeze'])
+    installed_packages = [r.decode().split('==')[0] for r in requests.split()]
 
     print(installed_packages)
 
@@ -64,13 +64,13 @@ def install_lib(lib):
 try:
     from openpyxl import load_workbook
 except ModuleNotFoundError:
-    print("\u001b[31;1mOpenpyxl library is not installed.")
+    print(f"{ansi['Bright Red']}Openpyxl library is not installed.")
     install_lib("Openpyxl")
     from openpyxl import load_workbook
 try:
     from requests import get
 except ModuleNotFoundError:
-    print("\u001b[31;1mRequests library is not installed.")
+    print(f"{ansi['Bright Red']}Requests library is not installed.")
     install_lib("requests")
     from requests import get
 
@@ -126,11 +126,11 @@ def get_current_cursor_pos():
     while keep_going:
         buff += getch().decode("ASCII")
         keep_going = kbhit()
-    newbuff =buff.replace("\x1b[", "")
-    if len(newbuff) == 5:
-        return [newbuff[:2], newbuff[3]]
-    elif len(newbuff) == 4:
-        return [newbuff[0], newbuff[2]]
+    new_buffer =buff.replace("\x1b[", "")
+    if len(new_buffer) == 5:
+        return [new_buffer[:2], new_buffer[3]]
+    elif len(new_buffer) == 4:
+        return [new_buffer[0], new_buffer[2]]
     else:
         return [0,0]
 
@@ -144,31 +144,31 @@ def manages_files():
         temp_loc = temp_dir + '//' + listdir(temp_dir)[0]
     except FileNotFoundError:
         print("\n")
-        print("\u001b[1m\u001b[31;1mThe template directory was not found.\n\nPlease add the template directory and restart.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}The template directory was not found.\n\nPlease add the template directory and restart.")
         done()
     except IndexError:
         print("\n")
-        print("\u001b[1m\u001b[31;1mThe template file was not found.\n\nPlease add the template file to the template directory and restart.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}The template file was not found.\n\nPlease add the template file to the template directory and restart.")
         done()
     try:
         in_loc = in_dir + '//' + listdir(in_dir)[0]
     except FileNotFoundError:
         print("\n")
-        print("\u001b[1m\u001b[31;1mThe input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}The input file or directory was not found.\n\nPlease add the input file to the input directory and restart.")
         done()
     except IndexError:
         print("\n")
-        print("\u001b[1m\u001b[31;1mThe input file was not found.\n\nPlease add the input file to the input directory and restart.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}The input file was not found.\n\nPlease add the input file to the input directory and restart.")
         done()
     #Copying template file to output directory
     try:
         copy(temp_loc, out_dir + '//out_' + listdir(temp_dir)[0])
     except FileNotFoundError:
         print("\n")
-        print("\u001b[1m\u001b[31;1mThe output directory was not found.\n\nPlease add the output directory and restart.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}The output directory was not found.\n\nPlease add the output directory and restart.")
         done()
     except Exception as e:
-        print("Make sure to close the template file or make sure template file is not being used by another program.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}Make sure to close the template file or make sure template file is not being used by another program.")
         print(e)
         done()
 
@@ -185,7 +185,7 @@ def perm_check(locs):
         permissions = [access(locs[i], R_OK), access(locs[i], W_OK), access(locs[i], X_OK)]
         for j in range(len(permissions)):
             if not permissions[j]:
-                print(f"\u001b[1m\u001b[31;1mThe script does not have {access_type[j]} access to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
+                print(f"{ansi['Bold']}{ansi['Bright Red']}The script does not have {access_type[j]} access to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
             else:
                 #print(f"\u001b[1m\u001b[31;1mThe script does have {access_type[j]} access to the {file_names[i]} file. Make sure the file is closed and permissions are set.")
                 continue
@@ -206,7 +206,7 @@ def get_address_comment_array_from_input(location):
     try:
         array = list(reader(open(location, encoding= "ISO8859")))
     except PermissionError:
-        print("\u001b[1m\u001b[31mError: Could not access input file.")
+        print(f"{ansi['Bold']}{ansi['Bright Red']}Error: Could not access input file.")
         done()
     return array
 
@@ -215,7 +215,7 @@ def get_address_comment_array_from_input(location):
 def done():
     print("\u001b[37m\u001b[0m")
     time_elapsed = round((perf_counter() - t1), 3)
-    print(" ".join(["Execution time: ", f"{time_elapsed}", "sec(s)"]))
+    print(" ".join([f"{ansi['Reset']}Execution time: ", f"{time_elapsed}", "sec(s)"]))
     #input("throwaway")
     exit()
 
@@ -247,7 +247,7 @@ def main():
 
     match_count, address_array_len = 0, len(address_array)
     
-    print("\n\u001b[0m\u001b[32mWorking on it...",flush=True, end="")
+    print(f"\n{ansi['Reset']}{ansi['Green']}Working on it...",flush=True, end="")
 
     #set the progress bar total and start the progress bar thread
     address_prog_bar = progressBar(0, address_array_len)
@@ -289,9 +289,9 @@ def main():
     
     #display stats and warning if needed
     print("\nDone.", flush=True)
-    print("\n\u001b[34;1mNumber of comments found:\u001b[33m" + str(match_count))
+    print(f"\n{ansi['Bright Blue']}Number of comments found:{ansi['Yellow']}" + str(match_count))
     if match_count == 0:
-        print("\u001b[33;1m***No matches were found. Make sure your input and template files are correct***")
+        print(f"{ansi['Bright Yellow']}***No matches were found. Make sure your input and template files are correct***")
 
     #reset and exit()
     done()
