@@ -41,7 +41,7 @@ ansi = {
 
 
 
-v = "v1.2.3"
+v = "v1.2.4"
 
 
 t1 = perf_counter()
