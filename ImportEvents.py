@@ -41,7 +41,7 @@ ansi = {
 
 
 
-v = "v1.2.4"
+v = "v1.2.5"
 
 
 t1 = perf_counter()
@@ -208,6 +208,12 @@ def get_address_comment_array_from_input(location):
     except PermissionError:
         print(f"{ansi['Bold']}{ansi['Bright Red']}Error: Could not access input file.")
         done()
+    except:
+        print(f"""{ansi['Bright Red']}{ansi['Bold']}An error occurred while reading the Toyopuc Comment file.\n\n
+            Possible Causes:\n
+            -Too many fields in the file (max 131072)
+            -The data is not supported under 'ISO8859' encoding
+            -The file is in use""")
     return array
 
 
